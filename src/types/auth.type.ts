@@ -6,6 +6,3 @@ export type AuthResponse = ResponseApi<{
   expires: string
   user: User
 }>
-
-
-
