@@ -1,11 +1,31 @@
 import { Link } from 'react-router-dom'
+import { useFloating, FloatingPortal, arrow, shift, offset } from '@floating-ui/react-dom-interactions'
+import { useRef, useState } from 'react'
+import { motion } from 'framer-motion'
 
 export default function Header() {
+  const [open, setOpen] = useState(false)
+  const arrowRef = useRef<HTMLElement>(null)
+  const { x, y, reference, floating, strategy, middlewareData } = useFloating({
+    middleware: [offset(6), shift(), arrow({ element: arrowRef })]
+  })
+  const showPopover = () => {
+    setOpen(true)
+  }
+  const hidePopover = () => {
+    setOpen(false)
+  }
+
   return (
     <div className='pb-5 pt-2 bg-[linear-gradient(-180deg,#f53d2d,#f63)] text-white'>
       <div className='container'>
         <div className='flex justify-end'>
-          <div className='flex items-center py-1 hover:text-gray-300 cursor-pointer'>
+          <div
+            className='flex items-center py-1 hover:text-gray-300 cursor-pointer'
+            ref={reference}
+            onMouseEnter={showPopover}
+            onMouseLeave={hidePopover}
+          >
             <svg
               xmlns='http://www.w3.org/2000/svg'
               fill='none'
@@ -20,6 +40,41 @@ export default function Header() {
                 d='M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418'
               />
             </svg>
+            <FloatingPortal>
+              {open && (
+                <motion.div
+                  ref={floating}
+                  style={{
+                    position: strategy,
+                    //strategy : chien dich xem thu dung absolute hay fixed
+                    top: y ?? 0,
+                    left: x ?? 0,
+                    width: 'max-content',
+                    transformOrigin: `${middlewareData.arrow?.x}px top`
+                  }}
+                  initial={{ opacity: 0, transform: 'scale(0)' }}
+                  animate={{ opacity: 1, transform: 'scale(1)' }}
+                  exit={{ opacity: 0, transform: 'scale(0)' }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <span
+                    ref={arrowRef}
+                    className='border-x-transparent border-t-transparent border-b-white border-[11px] absolute translate-y-[-95%] z-10'
+                    style={{
+                      left: middlewareData.arrow?.x,
+                      top: middlewareData.arrow?.y
+                    }}
+                  />
+                  {/* span > hien mui ten */}
+                  <div className='bg-white relative shadow-md rounded-sm border border-gray-200'>
+                    <div className='flex flex-col py-2 px-3'>
+                      <button className='py-2 px-3 hover:text-orange'>Tiếng Việt</button>
+                      <button className='py-2 px-3 hover:text-orange mt-2'>English</button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </FloatingPortal>
             <span className='mx-1'>Tiếng Việt</span>
             <svg
               xmlns='http://www.w3.org/2000/svg'
