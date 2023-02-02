@@ -8,8 +8,9 @@ interface Props {
   className?: string
   as?: ElementType
   initialOpen?: boolean
+  //thay doi thẻ tuy chon
   placement?: Placement
-  //thay doi the tuy chon
+  // bó lại và vị trí đứng .
 }
 
 export default function Popover({
