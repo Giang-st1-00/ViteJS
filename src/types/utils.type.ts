@@ -1,5 +1,5 @@
 export interface SuccessResponse<Data> {
-  message: string
+  message: string 
   data: Data
 }
 
