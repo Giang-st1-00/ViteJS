@@ -1,13 +1,14 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import classNames from 'classnames'
 import { Controller, useForm } from 'react-hook-form'
-import { createSearchParams, Link } from 'react-router-dom'
+import { createSearchParams, Link, useNavigate } from 'react-router-dom'
 import Button from 'src/Components/Button'
 import Input from 'src/Components/Input'
 import InputNumber from 'src/Components/InputNumber'
 import path from 'src/constants/path'
 import { Category } from 'src/types/category'
-import { schema } from 'src/utils/rules'
+import { NoUndefinedField } from 'src/types/utils.type'
+import { Schema, schema } from 'src/utils/rules'
 import { QueryConfig } from '../ProductList'
 
 interface Props {
@@ -15,10 +16,7 @@ interface Props {
   categories: Category[]
 }
 
-type FormData = {
-  price_min: string
-  price_max: string
-}
+type FormData = NoUndefinedField<Pick<Schema, 'price_min' | 'price_max'>>
 
 const priceSchema = schema.pick(['price_max', 'price_min'])
 
@@ -35,12 +33,21 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
       price_min: '',
       price_max: ''
     },
-    resolver: yupResolver(priceSchema)
+    resolver: yupResolver(priceSchema),
+    shouldFocusError: false
   })
 
-  console.log(errors)
+  const navigate = useNavigate()
+
   const onSubmit = handleSubmit((data) => {
-    console.log(data)
+    navigate({
+      pathname: path.home,
+      search: createSearchParams({
+        ...queryConfig,
+        price_max: data.price_max,
+        price_min: data.price_min
+      }).toString()
+    })
   })
 
   return (
@@ -132,9 +139,11 @@ export default function AsideFilter({ queryConfig, categories }: Props) {
                     classNameInput='p-1 w-full outline-none border border-gray-300 focus:border-gray-500 rounded-sm focus:shadow-sm'
                     classNameError='hidden'
                     {...field}
+                    //-> day du ca ,vi du value={field.value} ref={field.ref}....
                     onChange={(event) => {
                       field.onChange(event)
                       trigger('price_max')
+                      //trigger giup validate ca price_max
                     }}
                   />
                 )
