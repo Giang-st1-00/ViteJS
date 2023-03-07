@@ -16,6 +16,7 @@ import { omit } from 'lodash'
 type FormData = Pick<Schema, 'name'>
 
 const nameSchema = schema.pick(['name'])
+const MAX_PURCHASES = 5
 
 export default function Header() {
   const queryConfig = useQueryConfig()
@@ -34,6 +35,13 @@ export default function Header() {
       setProfile(null)
     }
   })
+
+  const { data: purchasesInCartData } = useQuery({
+    queryKey: ['purchases', { status: purchasesStatus.inCart }],
+    queryFn: () => purchaseApi.getPurchases({ status: purchasesStatus.inCart })
+  })
+
+  const purchasesInCart = purchasesInCartData?.data.data
 
   const handleLogout = () => {
     logoutMutation.mutate()
